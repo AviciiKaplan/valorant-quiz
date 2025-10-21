@@ -8,44 +8,46 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     :root{
       --bg:#0e1116; --card:#141823; --text:#e7ecf9; --muted:#9ba3bb; --border:rgba(255,255,255,0.08);
-      --accent:#ff4655;              /* static fallback accent */
-      --pulse:#ff4655;               /* dynamic, RGB-reactive color set by JS */
-      --pulseAlpha:0.35;             /* dynamic intensity 0–0.6 */
-      --gradStart:#ff4655;           /* dynamic gradient stops */
+      --accent:#ff4655;           /* static fallback accent */
+      --pulse:#ff4655;            /* dynamic, RGB-reactive color set by JS */
+      --pulseAlpha:0.35;          /* dynamic intensity 0–0.6 */
+      --gradStart:#ff4655;        /* dynamic gradient stops */
       --gradEnd:#ff8e53;
     }
+
     *{box-sizing:border-box}
     body{margin:0;font-family:'Inter',sans-serif;background:radial-gradient(circle at top right,#1a1f2b,#0e1116);color:var(--text);overflow-x:hidden}
 
-    /* subtle entrance */
-    .fade-in{animation:fadeIn .6s ease forwards;opacity:0}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    /* animations */
+    .fade-in{animation:fadeIn .45s ease forwards;opacity:0}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
     .container{max-width:960px;margin:40px auto;padding:0 20px}
     header{text-align:center;margin-bottom:28px}
     header h1{font-size:2rem;font-weight:700;margin:0}
     header p{color:var(--muted);margin-top:8px}
 
-    .quiz-card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.4);overflow:hidden;position:relative}
+    .quiz-card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.4), 0 0 24px color-mix(in srgb, var(--pulse) calc(var(--pulseAlpha)*100%), transparent);overflow:hidden;position:relative}
 
     .quiz-header{display:flex;justify-content:space-between;align-items:center;padding:18px;background:linear-gradient(135deg,var(--gradStart),var(--gradEnd));color:white;position:relative}
-    .quiz-header::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 22px 6px color-mix(in srgb, var(--pulse) calc(var(--pulseAlpha)*100%), transparent);}
-
+    .quiz-header::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 22px 6px color-mix(in srgb, var(--pulse) calc(var(--pulseAlpha)*100%), transparent)}
     .quiz-header h2{margin:0;font-size:1.1rem;letter-spacing:.4px}
 
     .btn{background:linear-gradient(135deg,var(--gradStart),var(--gradEnd));border:none;border-radius:10px;color:white;font-weight:600;padding:10px 16px;cursor:pointer;transition:.2s transform,.2s filter;box-shadow:0 0 0 1px rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.35)}
     .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    .btn.secondary{background:#0f1422;border:1px solid var(--border);color:var(--text);box-shadow:none}
 
-    .question{padding:22px;border-top:1px solid var(--border);animation:fadeIn .6s ease both}
-    .question h3{margin:0 0 10px;font-size:1rem}
+    .question{padding:22px;border-top:1px solid var(--border);min-height:200px}
+    .question h3{margin:0 0 12px;font-size:1.05rem}
     .options{display:grid;gap:12px}
     label.option{display:flex;align-items:center;gap:10px;background:#191d2b;padding:12px;border-radius:12px;cursor:pointer;border:1px solid var(--border);transition:.18s border-color,.18s background, .18s box-shadow}
     label.option:hover{border-color:var(--accent);background:#1f2537;box-shadow:0 0 14px color-mix(in srgb, var(--pulse) 25%, transparent)}
     input[type=radio]{accent-color:var(--accent)}
 
-    .footer{padding:16px;text-align:center;border-top:1px solid var(--border)}
+    .footer{display:flex;justify-content:space-between;gap:10px;padding:16px;border-top:1px solid var(--border)}
+    .progress{color:var(--muted);font-size:.95rem}
 
-    .result{padding:24px;text-align:center;animation:fadeIn .8s ease both}
+    .result{padding:24px;text-align:center}
     .agents{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:18px}
     .agent-card{background:#191d2b;border:1px solid var(--border);border-radius:14px;overflow:hidden;width:260px;transition:.3s;opacity:0;animation:fadeIn .8s ease .2s forwards;box-shadow:0 0 0 1px rgba(255,255,255,.04), 0 12px 28px rgba(0,0,0,.45)}
     .agent-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.5), 0 0 18px color-mix(in srgb, var(--pulse) 30%, transparent)}
@@ -54,8 +56,9 @@
     .agent-info h4{margin:0;font-size:1.1rem}
     .agent-info p{margin:6px 0 0;font-size:.9rem;color:var(--muted)}
 
-    /* reactive border glow for the whole card */
-    .quiz-card{box-shadow:0 10px 40px rgba(0,0,0,.4), 0 0 24px color-mix(in srgb, var(--pulse) calc(var(--pulseAlpha)*100%), transparent)}
+    /* end transition */
+    #blackFade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease;z-index:9999}
+    #blackFade.on{opacity:1}
 
     .audio-controls{display:flex;gap:10px;align-items:center}
     .toggle{appearance:none;background:#0f1422;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer}
@@ -65,22 +68,26 @@
   <div class="container fade-in">
     <header>
       <h1>Which Valorant Agent Are You?</h1>
-      <p>Discover your true playstyle. Updated for the latest roster. Audio-reactive RGB pulse enabled.</p>
+      <p>Discover your true playstyle. Audio‑reactive RGB pulse enabled.</p>
     </header>
 
-    <div class="quiz-card fade-in">
+    <div class="quiz-card fade-in" id="quizCard">
       <div class="quiz-header">
         <h2>Agent Personality Quiz</h2>
         <div class="audio-controls">
           <button class="toggle" id="musicToggle" aria-pressed="true">🔊 Music On</button>
-          <button class="btn" id="downloadBtn">Download .HTML</button>
           <button class="btn" id="restartBtn">Restart</button>
         </div>
       </div>
 
-      <form id="quiz"></form>
+      <div class="question" id="qWrap"></div>
       <div class="footer">
-        <button class="btn" id="submitBtn" type="button" disabled>Show My Agent</button>
+        <span class="progress" id="progress"></span>
+        <div style="display:flex;gap:10px">
+          <button class="btn secondary" id="prevBtn" type="button">Prev</button>
+          <button class="btn" id="nextBtn" type="button">Next</button>
+          <button class="btn" id="finishBtn" type="button" style="display:none">Finish</button>
+        </div>
       </div>
     </div>
 
@@ -91,13 +98,13 @@
     </div>
   </div>
 
-  <!-- Local audio assets (place alongside this HTML file) -->
+  <div id="blackFade"></div>
+
   <audio id="bgm" src="zedd_spectrum.mp3" preload="auto" loop></audio>
   <audio id="sfx" src="valorant_ui.mp3" preload="auto"></audio>
   <audio id="resultSfx" src="zedd_final.mp3" preload="auto"></audio>
 
   <script>
-    /* ------------------------------ Quiz Data ------------------------------ */
     const QUESTIONS=[
       {q:'What’s your role in the squad?',opts:['Duelist','Controller','Initiator','Sentinel']},
       {q:'Your biggest strength?',opts:['Aim & aggression','Strategy & planning','Team coordination','Defense & utility']},
@@ -131,194 +138,120 @@
       {name:'Sage',role:'Sentinel',traits:['Defense & utility','Support & intel'],img:'https://static.valorantstats.xyz/agents/sage.jpg'}
     ];
 
-    /* ------------------------------ DOM Hooks ------------------------------ */
-    const qContainer=document.getElementById('quiz');
-    const submitBtn=document.getElementById('submitBtn');
+    const qWrap=document.getElementById('qWrap');
+    const progressEl=document.getElementById('progress');
+    const prevBtn=document.getElementById('prevBtn');
+    const nextBtn=document.getElementById('nextBtn');
+    const finishBtn=document.getElementById('finishBtn');
     const resultSection=document.getElementById('resultSection');
     const summary=document.getElementById('summary');
     const agentResults=document.getElementById('agentResults');
-    const downloadBtn=document.getElementById('downloadBtn');
     const restartBtn=document.getElementById('restartBtn');
     const musicToggle=document.getElementById('musicToggle');
     const bgm=document.getElementById('bgm');
     const sfx=document.getElementById('sfx');
     const resultSfx=document.getElementById('resultSfx');
+    const blackFade=document.getElementById('blackFade');
 
-    /* ------------------------------ Render Quiz ------------------------------ */
-    function renderQuiz(){
-      qContainer.innerHTML='';
-      QUESTIONS.forEach((q,i)=>{
-        const block=document.createElement('div');block.className='question fade-in';
-        block.innerHTML=`<h3>${i+1}. ${q.q}</h3>`;
-        const opts=document.createElement('div');opts.className='options';
-        q.opts.forEach(opt=>{
-          const label=document.createElement('label');label.className='option';
-          const input=document.createElement('input');input.type='radio';input.name='q'+i;input.value=opt;
-          input.addEventListener('change',()=>{checkCompletion(); playUI();});
-          label.appendChild(input);label.appendChild(document.createTextNode(opt));opts.appendChild(label);
-        });
-        block.appendChild(opts);qContainer.appendChild(block);
+    let current=0;
+    const answers=new Array(QUESTIONS.length).fill(null);
+
+    function renderQuestion(idx){
+      const q=QUESTIONS[idx];
+      qWrap.classList.remove('fade-in'); void qWrap.offsetWidth; qWrap.classList.add('fade-in');
+      qWrap.innerHTML=`<h3>${idx+1}. ${q.q}</h3>`;
+      const opts=document.createElement('div'); opts.className='options';
+      q.opts.forEach((opt)=>{
+        const id=`q${idx}_${opt.replace(/[^a-z0-9]+/gi,'')}`;
+        const label=document.createElement('label'); label.className='option';
+        const input=document.createElement('input'); input.type='radio'; input.name='q'+idx; input.id=id; input.value=opt;
+        if(answers[idx]===opt) input.checked=true;
+        input.addEventListener('change',()=>{answers[idx]=opt; playUI(); updateNav();});
+        const span=document.createElement('span'); span.textContent=opt;
+        label.appendChild(input); label.appendChild(span);
+        opts.appendChild(label);
       });
+      qWrap.appendChild(opts);
+      progressEl.textContent=`Question ${idx+1} of ${QUESTIONS.length}`;
+      updateNav();
+      document.getElementById('quizCard').scrollIntoView({behavior:'smooth', block:'center'});
     }
 
-    function checkCompletion(){
-      const total=QUESTIONS.length;
-      const answered=document.querySelectorAll('input[type=radio]:checked').length;
-      submitBtn.disabled=answered!==total;
+    function updateNav(){
+      prevBtn.disabled = current===0;
+      const hasAnswer = answers[current]!==null;
+      nextBtn.disabled = !hasAnswer || current===QUESTIONS.length-1;
+      finishBtn.style.display = current===QUESTIONS.length-1 ? 'inline-block' : 'none';
+      finishBtn.disabled = !hasAnswer;
     }
 
-    function evaluate(){
-      const answers=[...document.querySelectorAll('input[type=radio]:checked')].map(i=>i.value);
+    prevBtn.addEventListener('click',()=>{ if(current>0){ current--; playUI(); renderQuestion(current);} });
+    nextBtn.addEventListener('click',()=>{ if(current<QUESTIONS.length-1){ current++; playUI(); renderQuestion(current);} });
+
+    finishBtn.addEventListener('click', async ()=>{
+      playUI();
+      await endSequence();
+      const agent = computeResult();
+      revealResult(agent);
+    });
+
+    function computeResult(){
       let best=null,bestScore=-1;
+      answers.forEach(()=>{}); // keep JIT warm
       AGENTS.forEach(agent=>{
-        let score=0;answers.forEach(ans=>{if(agent.traits.includes(ans))score++;});
+        let score=0; answers.forEach(ans=>{ if(agent.traits.includes(ans)) score++; });
         if(score>bestScore){bestScore=score;best=agent;}
       });
-      showResult(best);
+      return best || AGENTS[Math.floor(Math.random()*AGENTS.length)];
     }
-/*Quiz results generating */
-    function showResult(agent){
-      playUI();
-      // Play custom result sound
-      try{ resultSfx.currentTime=0; resultSfx.volume=0.65; resultSfx.play().catch(()=>{}); }catch(e){}
 
+    function revealResult(agent){
       resultSection.hidden=false;
       summary.textContent=`You match ${agent.name} — a ${agent.role} with traits like ${agent.traits.join(', ')}.`;
       agentResults.innerHTML=`<div class='agent-card'><img class='agent-img' src='${agent.img}' alt='${agent.name}'><div class='agent-info'><h4>${agent.name}</h4><p>${agent.role}</p></div></div>`;
       window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     }
 
-    submitBtn.addEventListener('click',evaluate);
-    restartBtn.addEventListener('click',()=>{resultSection.hidden=true;renderQuiz();submitBtn.disabled=true;playUI();});
+    async function endSequence(){
+      try{await fadeVolume(0.0,600); bgm.pause();}catch(e){}
+      blackFade.classList.add('on');
+      await wait(800);
+      try{resultSfx.currentTime=0; resultSfx.volume=0.75; await resultSfx.play();}catch(e){}
+      await wait(600);
+      blackFade.classList.remove('on');
+      try{bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,900);}catch(e){}
+    }
 
-    downloadBtn.addEventListener('click',()=>{
-      const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='valorant-agent-quiz.html';a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    restartBtn.addEventListener('click',()=>{
+      for(let i=0;i<answers.length;i++) answers[i]=null;
+      current=0; resultSection.hidden=true; renderQuestion(0); playUI();
     });
 
-    /* ------------------------------ Audio + Reactive RGB ------------------------------ */
-    let audioCtx, analyser, srcNode, freqData;  
-    let rafId=null; let hue=0;
+    /* audio + RGB reactive */
+    let audioCtx,analyser,srcNode,freqData; let rafId=null; let hue=0;
+    function setupAudio(){ if(audioCtx) return; audioCtx=new(window.AudioContext||window.webkitAudioContext)(); analyser=audioCtx.createAnalyser(); analyser.fftSize=1024; freqData=new Uint8Array(analyser.frequencyBinCount); srcNode=audioCtx.createMediaElementSource(bgm); srcNode.connect(analyser); analyser.connect(audioCtx.destination); }
+    function avg(arr,s=0,e=arr.length){ let t=0,c=0; for(let i=s;i<e;i++){t+=arr[i];c++;} return c? t/c : 0; }
+    function animatePulse(){ analyser.getByteFrequencyData(freqData); const bass=avg(freqData,0,10); const highs=avg(freqData,40,120); const intensity=Math.min(0.6,(bass/255)*0.6); document.documentElement.style.setProperty('--pulseAlpha',intensity.toFixed(3)); hue=(hue+0.6+highs/1000)%360; const gradA=`hsl(${(hue)%360},90%,58%)`; const gradB=`hsl(${(hue+30)%360},90%,60%)`; document.documentElement.style.setProperty('--pulse',gradA); document.documentElement.style.setProperty('--gradStart',gradA); document.documentElement.style.setProperty('--gradEnd',gradB); rafId=requestAnimationFrame(animatePulse); }
+    function startReactive(){ if(!audioCtx) setupAudio(); if(rafId==null) rafId=requestAnimationFrame(animatePulse); }
 
-    function setupAudio(){
-      if(audioCtx) return;
-      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 1024; // good balance
-      freqData = new Uint8Array(analyser.frequencyBinCount);
-      srcNode = audioCtx.createMediaElementSource(bgm);
-      srcNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    }
+    function fadeVolume(target=0.4,ms=1200){ const step=16; const delta=(target-bgm.volume)/(ms/step); return new Promise(res=>{ const id=setInterval(()=>{ let v=bgm.volume+delta; if((delta>0 && v>=target) || (delta<0 && v<=target)){ v=target; clearInterval(id);} bgm.volume=Math.max(0,Math.min(1,v)); if(v===target) res(); },step); }); }
+    function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-    function avg(arr, start=0, end=arr.length){
-      let s=0,c=0; for(let i=start;i<end;i++){s+=arr[i];c++;} return c? s/c : 0;
-    }
-
-    function animatePulse(){
-      analyser.getByteFrequencyData(freqData);
-      // bass ~0-120Hz -> bins 0..8 roughly
-      const bass = avg(freqData, 0, 10);
-      // highs for sparkle
-      const highs = avg(freqData, 40, 120);
-
-      // intensity 0..0.6 range
-      const intensity = Math.min(0.6, (bass/255)*0.6);
-      document.documentElement.style.setProperty('--pulseAlpha', intensity.toFixed(3));
-
-      // hue cycle (RGB sweep) + highs add subtle acceleration
-      hue = (hue + 0.6 + highs/1000) % 360;
-      const pulse = `hsl(${hue.toFixed(1)}, 90%, 58%)`;
-      const gradA = `hsl(${(hue)%360}, 90%, 58%)`;
-      const gradB = `hsl(${(hue+30)%360}, 90%, 60%)`;
-      document.documentElement.style.setProperty('--pulse', pulse);
-      document.documentElement.style.setProperty('--gradStart', gradA);
-      document.documentElement.style.setProperty('--gradEnd', gradB);
-
-      rafId = requestAnimationFrame(animatePulse);
-    }
-
-    function startReactive(){
-      if(!audioCtx) setupAudio();
-      if(rafId==null) rafId = requestAnimationFrame(animatePulse);
-    }
-    function stopReactive(){
-      if(rafId!=null){ cancelAnimationFrame(rafId); rafId=null; }
-      // fall back to static accent
-      document.documentElement.style.setProperty('--pulse', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim());
-      document.documentElement.style.setProperty('--pulseAlpha', '0.15');
-      document.documentElement.style.setProperty('--gradStart', '#ff4655');
-      document.documentElement.style.setProperty('--gradEnd', '#ff8e53');
-    }
-
-    function fadeVolume(target=0.4, ms=1500){
-      const step=16; const delta = (target - bgm.volume) / (ms/step);
-      return new Promise(res=>{
-        const id=setInterval(()=>{
-          let v = bgm.volume + delta; if((delta>0 && v>=target) || (delta<0 && v<=target)){ v=target; clearInterval(id); }
-          bgm.volume = Math.max(0, Math.min(1, v));
-          if(v===target) res();
-        }, step);
-      });
-    }
-
-    async function playMusicAuto(){
-      try{
-        setupAudio();
-        bgm.volume = 0.0; // start silent, fade to 40%
-        await bgm.play();
-        await fadeVolume(0.4, 1500);
-        startReactive();
-        musicToggle.textContent = '🔊 Music On';
-        musicToggle.setAttribute('aria-pressed','true');
-      }catch(e){
-        // Autoplay may be blocked — enable on first interaction
-        musicToggle.textContent = '🔇 Music Off';
-        musicToggle.setAttribute('aria-pressed','false');
-      }
-    }
-
-    async function toggleMusic(){
+    async function playMusicAuto(){ try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,1500); startReactive(); musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }catch(e){ musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); } }
+    musicToggle.addEventListener('click', async ()=>{
       const on = musicToggle.getAttribute('aria-pressed')==='true';
-      if(on){
-        // turn OFF
-        await fadeVolume(0.0, 800);
-        bgm.pause();
-        stopReactive();
-        musicToggle.textContent='🔇 Music Off';
-        musicToggle.setAttribute('aria-pressed','false');
-      }else{
-        // turn ON
-        setupAudio();
-        bgm.volume=0.0;
-        await bgm.play();
-        await fadeVolume(0.4, 1200);
-        startReactive();
-        musicToggle.textContent='🔊 Music On';
-        musicToggle.setAttribute('aria-pressed','true');
-      }
-    }
+      if(on){ await fadeVolume(0.0,800); bgm.pause(); musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); }
+      else{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,1000); startReactive(); musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }
+    });
 
-    function playUI(){
-      try{
-        // clone for overlapping clicks
-        const a = sfx.cloneNode(true); a.volume=0.55; a.play().catch(()=>{});
-      }catch(e){}
-    }
+    function playUI(){ try{ const a=sfx.cloneNode(true); a.volume=0.55; a.play().catch(()=>{}); }catch(e){} }
 
-    musicToggle.addEventListener('click', toggleMusic);
-
-    /* ------------------------------ Boot ------------------------------ */
-    renderQuiz();
-    submitBtn.disabled=true;
-    // Attempt autoplay; if blocked, button shows Off and user can enable
+    renderQuestion(0);
     window.addEventListener('load', playMusicAuto);
-    // Fallback: first user interaction will try to start audio
     ['click','keydown','touchstart'].forEach(evt=>{
       window.addEventListener(evt, ()=>{
         if(bgm.paused && musicToggle.getAttribute('aria-pressed')!=='true'){
-          toggleMusic();
+          musicToggle.click();
         }
       }, {once:true});
     });
