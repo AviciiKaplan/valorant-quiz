@@ -18,7 +18,6 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:'Inter',sans-serif;background:radial-gradient(circle at top right,#1a1f2b,#0e1116);color:var(--text);overflow-x:hidden}
 
-    /* animations */
     .fade-in{animation:fadeIn .45s ease forwards;opacity:0}
     @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
@@ -56,7 +55,6 @@
     .agent-info h4{margin:0;font-size:1.1rem}
     .agent-info p{margin:6px 0 0;font-size:.9rem;color:var(--muted)}
 
-    /* end transition */
     #blackFade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease;z-index:9999}
     #blackFade.on{opacity:1}
 
@@ -68,7 +66,7 @@
   <div class="container fade-in">
     <header>
       <h1>Which Valorant Agent Are You?</h1>
-      <p>Discover your true playstyle. Audio‑reactive RGB pulse enabled.</p>
+      <p>Discover your true playstyle. Audio-reactive RGB pulse enabled.</p>
     </header>
 
     <div class="quiz-card fade-in" id="quizCard">
@@ -105,6 +103,15 @@
   <audio id="resultSfx" src="zedd_final.mp3" preload="auto"></audio>
 
   <script>
+    const AGENT_NAMES=['Jett','Raze','Reyna','Omen','Brimstone','Viper','Sova','Skye','KAYO','Cypher','Killjoy','Sage'];
+
+    const AGENTS=AGENT_NAMES.map(name=>({
+      name:name,
+      role:{Jett:'Duelist',Raze:'Duelist',Reyna:'Duelist',Omen:'Controller',Brimstone:'Controller',Viper:'Controller',Sova:'Initiator',Skye:'Initiator',KAYO:'Initiator',Cypher:'Sentinel',Killjoy:'Sentinel',Sage:'Sentinel'}[name]||'Agent',
+      traits:[],
+      img:`agentphotos/${name}_icon.webp`
+    }));
+
     const QUESTIONS=[
       {q:'What’s your role in the squad?',opts:['Duelist','Controller','Initiator','Sentinel']},
       {q:'Your biggest strength?',opts:['Aim & aggression','Strategy & planning','Team coordination','Defense & utility']},
@@ -121,21 +128,6 @@
       {q:'Your communication style?',opts:['Short & direct','Calm & steady','Energetic','Silent but effective']},
       {q:'Pick your color palette:',opts:['Red & Black','Blue & Silver','Green & Teal','Purple & Gold']},
       {q:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
-    ];
-
-    const AGENTS=[
-      {name:'Jett',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush'],img:'https://static.valorantstats.xyz/agents/jett.jpg'},
-      {name:'Raze',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush'],img:'https://static.valorantstats.xyz/agents/raze.jpg'},
-      {name:'Reyna',role:'Duelist',traits:['Fast','Aim & aggression'],img:'https://static.valorantstats.xyz/agents/reyna.jpg'},
-      {name:'Omen',role:'Controller',traits:['Slow & methodical','Strategy & planning'],img:'https://static.valorantstats.xyz/agents/omen.jpg'},
-      {name:'Brimstone',role:'Controller',traits:['Strategy & planning','Anchor sites'],img:'https://static.valorantstats.xyz/agents/brimstone.jpg'},
-      {name:'Viper',role:'Controller',traits:['Strategy & planning','Anchor sites'],img:'https://static.valorantstats.xyz/agents/viper.jpg'},
-      {name:'Sova',role:'Initiator',traits:['Support & intel','Team coordination'],img:'https://static.valorantstats.xyz/agents/sova.jpg'},
-      {name:'Skye',role:'Initiator',traits:['Team coordination','Support & intel'],img:'https://static.valorantstats.xyz/agents/skye.jpg'},
-      {name:'KAY/O',role:'Initiator',traits:['Team coordination','Balanced'],img:'https://static.valorantstats.xyz/agents/kayo.jpg'},
-      {name:'Cypher',role:'Sentinel',traits:['Defense & utility','Anchor sites'],img:'https://static.valorantstats.xyz/agents/cypher.jpg'},
-      {name:'Killjoy',role:'Sentinel',traits:['Defense & utility','Strategy & planning'],img:'https://static.valorantstats.xyz/agents/killjoy.jpg'},
-      {name:'Sage',role:'Sentinel',traits:['Defense & utility','Support & intel'],img:'https://static.valorantstats.xyz/agents/sage.jpg'}
     ];
 
     const qWrap=document.getElementById('qWrap');
@@ -185,30 +177,33 @@
       finishBtn.disabled = !hasAnswer;
     }
 
-    prevBtn.addEventListener('click',()=>{ if(current>0){ current--; playUI(); renderQuestion(current);} });
-    nextBtn.addEventListener('click',()=>{ if(current<QUESTIONS.length-1){ current++; playUI(); renderQuestion(current);} });
+    prevBtn.addEventListener('click',()=>{ if(current>0){ current--; renderQuestion(current);} });
+    nextBtn.addEventListener('click',()=>{ if(current<QUESTIONS.length-1){ current++; renderQuestion(current);} });
 
     finishBtn.addEventListener('click', async ()=>{
-      playUI();
       await endSequence();
       const agent = computeResult();
       revealResult(agent);
     });
 
     function computeResult(){
-      let best=null,bestScore=-1;
-      answers.forEach(()=>{}); // keep JIT warm
-      AGENTS.forEach(agent=>{
-        let score=0; answers.forEach(ans=>{ if(agent.traits.includes(ans)) score++; });
-        if(score>bestScore){bestScore=score;best=agent;}
-      });
-      return best || AGENTS[Math.floor(Math.random()*AGENTS.length)];
+      return AGENTS[Math.floor(Math.random()*AGENTS.length)];
     }
 
     function revealResult(agent){
       resultSection.hidden=false;
-      summary.textContent=`You match ${agent.name} — a ${agent.role} with traits like ${agent.traits.join(', ')}.`;
-      agentResults.innerHTML=`<div class='agent-card'><img class='agent-img' src='${agent.img}' alt='${agent.name}'><div class='agent-info'><h4>${agent.name}</h4><p>${agent.role}</p></div></div>`;
+      summary.textContent=`You match ${agent.name} — a ${agent.role}.`;
+      const card=document.createElement('div');
+      card.className='agent-card';
+      const img=document.createElement('img');
+      img.className='agent-img';
+      img.src=agent.img;
+      img.alt=agent.name;
+      img.onerror=()=>{img.src='agentphotos/Default_icon.webp';};
+      const info=document.createElement('div'); info.className='agent-info';
+      info.innerHTML=`<h4>${agent.name}</h4><p>${agent.role}</p>`;
+      card.appendChild(img); card.appendChild(info);
+      agentResults.innerHTML=''; agentResults.appendChild(card);
       window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     }
 
@@ -224,37 +219,15 @@
 
     restartBtn.addEventListener('click',()=>{
       for(let i=0;i<answers.length;i++) answers[i]=null;
-      current=0; resultSection.hidden=true; renderQuestion(0); playUI();
+      current=0; resultSection.hidden=true; renderQuestion(0);
     });
 
-    /* audio + RGB reactive */
     let audioCtx,analyser,srcNode,freqData; let rafId=null; let hue=0;
     function setupAudio(){ if(audioCtx) return; audioCtx=new(window.AudioContext||window.webkitAudioContext)(); analyser=audioCtx.createAnalyser(); analyser.fftSize=1024; freqData=new Uint8Array(analyser.frequencyBinCount); srcNode=audioCtx.createMediaElementSource(bgm); srcNode.connect(analyser); analyser.connect(audioCtx.destination); }
     function avg(arr,s=0,e=arr.length){ let t=0,c=0; for(let i=s;i<e;i++){t+=arr[i];c++;} return c? t/c : 0; }
+
     function animatePulse(){ analyser.getByteFrequencyData(freqData); const bass=avg(freqData,0,10); const highs=avg(freqData,40,120); const intensity=Math.min(0.6,(bass/255)*0.6); document.documentElement.style.setProperty('--pulseAlpha',intensity.toFixed(3)); hue=(hue+0.6+highs/1000)%360; const gradA=`hsl(${(hue)%360},90%,58%)`; const gradB=`hsl(${(hue+30)%360},90%,60%)`; document.documentElement.style.setProperty('--pulse',gradA); document.documentElement.style.setProperty('--gradStart',gradA); document.documentElement.style.setProperty('--gradEnd',gradB); rafId=requestAnimationFrame(animatePulse); }
+
     function startReactive(){ if(!audioCtx) setupAudio(); if(rafId==null) rafId=requestAnimationFrame(animatePulse); }
 
-    function fadeVolume(target=0.4,ms=1200){ const step=16; const delta=(target-bgm.volume)/(ms/step); return new Promise(res=>{ const id=setInterval(()=>{ let v=bgm.volume+delta; if((delta>0 && v>=target) || (delta<0 && v<=target)){ v=target; clearInterval(id);} bgm.volume=Math.max(0,Math.min(1,v)); if(v===target) res(); },step); }); }
-    function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-    async function playMusicAuto(){ try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,1500); startReactive(); musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }catch(e){ musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); } }
-    musicToggle.addEventListener('click', async ()=>{
-      const on = musicToggle.getAttribute('aria-pressed')==='true';
-      if(on){ await fadeVolume(0.0,800); bgm.pause(); musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); }
-      else{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,1000); startReactive(); musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }
-    });
-
-    function playUI(){ try{ const a=sfx.cloneNode(true); a.volume=0.55; a.play().catch(()=>{}); }catch(e){} }
-
-    renderQuestion(0);
-    window.addEventListener('load', playMusicAuto);
-    ['click','keydown','touchstart'].forEach(evt=>{
-      window.addEventListener(evt, ()=>{
-        if(bgm.paused && musicToggle.getAttribute('aria-pressed')!=='true'){
-          musicToggle.click();
-        }
-      }, {once:true});
-    });
-  </script>
-</body>
-</html>
+    function fadeVolume(target=0.4,ms=1200){ const step=16; const delta=(target-bgm.volume)/(ms/step); return new Promise(res=>{ const id=setInterval(()=>{ let v=bgm.volume+delta; if((delta>0 && v>=target) || (delta<0 && v<=target)){ v=target; clearInterval(id);} bgm.volume=Math.max(0,Math.min(1,v
