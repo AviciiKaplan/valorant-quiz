@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Which Valorant Agent Are You?</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    :root{
+      --bg:#0e1116; --card:#141823; --accent:#ff4655; --text:#e7ecf9; --muted:#9ba3bb;
+      --border:rgba(255,255,255,0.08); --gradient:linear-gradient(135deg,#ff4655,#ff8e53);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Inter',sans-serif;background:radial-gradient(circle at top right,#1a1f2b,#0e1116);color:var(--text);}
+    .container{max-width:960px;margin:40px auto;padding:0 20px;}
+    header{text-align:center;margin-bottom:32px;}
+    header h1{font-size:2rem;font-weight:700;margin:0;}
+    header p{color:var(--muted);margin-top:8px;}
+    .quiz-card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.4);overflow:hidden;}
+    .quiz-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:var(--gradient);color:white;}
+    .quiz-header h2{margin:0;font-size:1.2rem;}
+    .btn{background:var(--gradient);border:none;border-radius:10px;color:white;font-weight:600;padding:10px 18px;cursor:pointer;transition:.2s;}
+    .btn:hover{opacity:0.9;}
+    .question{padding:24px;border-top:1px solid var(--border);}
+    .question h3{margin-top:0;margin-bottom:12px;font-size:1rem;}
+    .options{display:grid;gap:12px;}
+    label.option{display:flex;align-items:center;gap:10px;background:#191d2b;padding:12px;border-radius:12px;cursor:pointer;border:1px solid var(--border);transition:.2s;}
+    label.option:hover{border-color:var(--accent);background:#1f2537;}
+    input[type=radio]{accent-color:var(--accent);}
+    .footer{padding:16px;text-align:center;border-top:1px solid var(--border);}
+    .result{padding:24px;text-align:center;}
+    .agents{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:20px;}
+    .agent-card{background:#191d2b;border:1px solid var(--border);border-radius:14px;overflow:hidden;width:260px;transition:.2s;}
+    .agent-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.4);}
+    .agent-img{width:100%;height:160px;object-fit:cover;}
+    .agent-info{padding:14px;text-align:left;}
+    .agent-info h4{margin:0;font-size:1.1rem;}
+    .agent-info p{margin:6px 0 0;font-size:0.9rem;color:var(--muted);}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Which Valorant Agent Are You?</h1>
+      <p>Discover your true playstyle. Updated for the latest roster!</p>
+    </header>
+
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <h2>Agent Personality Quiz</h2>
+        <div>
+          <button class="btn" id="downloadBtn">Download .HTML</button>
+          <button class="btn" id="restartBtn">Restart</button>
+        </div>
+      </div>
+
+      <form id="quiz"></form>
+      <div class="footer">
+        <button class="btn" id="submitBtn" type="button" disabled>Show My Agent</button>
+      </div>
+    </div>
+
+    <div class="result" id="resultSection" hidden>
+      <h2>Your Agent Match</h2>
+      <p id="summary"></p>
+      <div class="agents" id="agentResults"></div>
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS=[
+      {q:'What’s your role in the squad?',opts:['Duelist','Controller','Initiator','Sentinel']},
+      {q:'Your biggest strength?',opts:['Aim & aggression','Strategy & planning','Team coordination','Defense & utility']},
+      {q:'Your ideal map control?',opts:['Entry & rush','Mid control','Support & intel','Anchor sites']},
+      {q:'Pick your favorite pace:',opts:['Fast','Slow & methodical','Reactive','Balanced']},
+      {q:'Your biggest flaw?',opts:['Overheat','Too passive','Overthink','Tunnel vision']}
+    ];
+
+    const AGENTS=[
+      {name:'Jett',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush'],img:'https://static.valorantstats.xyz/agents/jett.jpg'},
+      {name:'Raze',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush'],img:'https://static.valorantstats.xyz/agents/raze.jpg'},
+      {name:'Reyna',role:'Duelist',traits:['Fast','Aim & aggression'],img:'https://static.valorantstats.xyz/agents/reyna.jpg'},
+      {name:'Omen',role:'Controller',traits:['Slow & methodical','Strategy & planning'],img:'https://static.valorantstats.xyz/agents/omen.jpg'},
+      {name:'Brimstone',role:'Controller',traits:['Strategy & planning','Anchor sites'],img:'https://static.valorantstats.xyz/agents/brimstone.jpg'},
+      {name:'Viper',role:'Controller',traits:['Strategy & planning','Anchor sites'],img:'https://static.valorantstats.xyz/agents/viper.jpg'},
+      {name:'Sova',role:'Initiator',traits:['Support & intel','Team coordination'],img:'https://static.valorantstats.xyz/agents/sova.jpg'},
+      {name:'Skye',role:'Initiator',traits:['Team coordination','Support & intel'],img:'https://static.valorantstats.xyz/agents/skye.jpg'},
+      {name:'KAY/O',role:'Initiator',traits:['Team coordination','Balanced'],img:'https://static.valorantstats.xyz/agents/kayo.jpg'},
+      {name:'Cypher',role:'Sentinel',traits:['Defense & utility','Anchor sites'],img:'https://static.valorantstats.xyz/agents/cypher.jpg'},
+      {name:'Killjoy',role:'Sentinel',traits:['Defense & utility','Strategy & planning'],img:'https://static.valorantstats.xyz/agents/killjoy.jpg'},
+      {name:'Sage',role:'Sentinel',traits:['Defense & utility','Support & intel'],img:'https://static.valorantstats.xyz/agents/sage.jpg'}
+    ];
+
+    const qContainer=document.getElementById('quiz');
+    const submitBtn=document.getElementById('submitBtn');
+    const resultSection=document.getElementById('resultSection');
+    const summary=document.getElementById('summary');
+    const agentResults=document.getElementById('agentResults');
+
+    function renderQuiz(){
+      qContainer.innerHTML='';
+      QUESTIONS.forEach((q,i)=>{
+        const block=document.createElement('div');block.className='question';
+        block.innerHTML=`<h3>${i+1}. ${q.q}</h3>`;
+        const opts=document.createElement('div');opts.className='options';
+        q.opts.forEach(opt=>{
+          const label=document.createElement('label');label.className='option';
+          const input=document.createElement('input');input.type='radio';input.name='q'+i;input.value=opt;
+          input.addEventListener('change',checkCompletion);
+          label.appendChild(input);label.appendChild(document.createTextNode(opt));opts.appendChild(label);
+        });
+        block.appendChild(opts);qContainer.appendChild(block);
+      });
+    }
+
+    function checkCompletion(){
+      const total=QUESTIONS.length;
+      const answered=document.querySelectorAll('input[type=radio]:checked').length;
+      submitBtn.disabled=answered!==total;
+    }
+
+    function evaluate(){
+      const answers=[...document.querySelectorAll('input[type=radio]:checked')].map(i=>i.value);
+      let best=null,bestScore=-1;
+      AGENTS.forEach(agent=>{
+        let score=0;answers.forEach(ans=>{if(agent.traits.includes(ans))score++;});
+        if(score>bestScore){bestScore=score;best=agent;}
+      });
+      showResult(best);
+    }
+
+    function showResult(agent){
+      resultSection.hidden=false;
+      summary.textContent=`You match ${agent.name} — a ${agent.role} with traits like ${agent.traits.join(', ')}.`;
+      agentResults.innerHTML=`<div class='agent-card'><img class='agent-img' src='${agent.img}' alt='${agent.name}'><div class='agent-info'><h4>${agent.name}</h4><p>${agent.role}</p></div></div>`;
+      window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+    }
+
+    document.getElementById('submitBtn').addEventListener('click',evaluate);
+    document.getElementById('restartBtn').addEventListener('click',()=>{resultSection.hidden=true;renderQuiz();submitBtn.disabled=true;});
+    document.getElementById('downloadBtn').addEventListener('click',()=>{
+      const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='valorant-agent-quiz.html';a.click();
+    });
+
+    renderQuiz();
+  </script>
+</body>
+</html>
