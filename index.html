@@ -83,7 +83,13 @@
 
   <div id="blackFade"></div>
 
-  <audio id="bgm" src="zedd_spectrum.mp3" preload="auto" loop></audio>
+  <!-- Dual-path + ogg fallback -->
+  <audio id="bgm" preload="auto" loop>
+    <source src="zedd_spectrum.mp3" type="audio/mpeg">
+    <source src="audio/zedd_spectrum.mp3" type="audio/mpeg">
+    <source src="zedd_spectrum.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
   <audio id="sfx" src="valorant_ui.mp3" preload="auto"></audio>
   <audio id="resultSfx" src="zedd_final.mp3" preload="auto"></audio>
 
@@ -106,43 +112,37 @@
       {q:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
     ];
 
-    // Full roster with traits (aligns with gameplay vibes)
+    // Full roster (based on your folder list) with traits
     const AGENTS=[
-      {name:'Jett',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Laugh it off','Competition','Short & direct','Red & Black','Adrenaline']},
-      {name:'Raze',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Energetic','Competition','Red & Black','Adrenaline']},
-      {name:'Reyna',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Sheriff','Short & direct','Competition','Red & Black','Adrenaline']},
-      {name:'Phoenix',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Energetic','Fun with friends','Red & Black']},
-      {name:'Yoru',role:'Duelist',traits:['Fast','Aim & aggression','Reactive','Go for duels','Urban streets','Aggressive','Take charge','Operator','Short & direct','Competition']},
-      {name:'Iso',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Industrial site','Aggressive','Take charge','Sheriff','Short & direct','Competition']},
-      {name:'Neon',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','High-tech lab','Aggressive','Take charge','Vandal','Energetic','Competition']},
-
-      {name:'Omen',role:'Controller',traits:['Slow & methodical','Strategy & planning','Mid control','Use utility smartly','Outthink the enemy','High-tech lab','Strategic','Stay focused','Phantom','Purple & Gold','Tactics']},
-      {name:'Brimstone',role:'Controller',traits:['Slow & methodical','Strategy & planning','Anchor sites','Use utility smartly','Industrial site','Reliable','Stay focused','Phantom','Teamwork','Blue & Silver','Tactics']},
-      {name:'Viper',role:'Controller',traits:['Slow & methodical','Strategy & planning','Anchor sites','Outthink the enemy','High-tech lab','Strategic','Stay focused','Phantom','Purple & Gold','Tactics']},
-      {name:'Harbor',role:'Controller',traits:['Balanced','Strategy & planning','Support & intel','Use utility smartly','Nature/forest','Reliable','Adapt','Phantom','Teamwork','Blue & Silver','Fun with friends']},
       {name:'Astra',role:'Controller',traits:['Slow & methodical','Strategy & planning','Mid control','Outthink the enemy','High-tech lab','Strategic','Stay calm and wait','Operator','Purple & Gold','Mastery']},
-      {name:'Clove',role:'Controller',traits:['Reactive','Strategy & planning','Support & intel','Balanced','Urban streets','Energetic','Adapt','Vandal','Fun with friends']},
-
-      {name:'Sova',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','High-tech lab','Strategic','Stay calm and wait','Phantom','Teamwork','Blue & Silver','Tactics']},
-      {name:'Skye',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Reactive','Nature/forest','Supportive','Adapt','Phantom','Teamwork','Green & Teal','Fun with friends']},
-      {name:'KAYO',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','High-tech lab','Reliable','Stay focused','Vandal','Short & direct','Tactics']},
       {name:'Breach',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Entry & rush','Industrial site','Aggressive','Take charge','Vandal','Energetic','Competition']},
+      {name:'Brimstone',role:'Controller',traits:['Slow & methodical','Strategy & planning','Anchor sites','Use utility smartly','Industrial site','Reliable','Stay focused','Phantom','Teamwork','Blue & Silver','Tactics']},
+      {name:'Chamber',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Mid control','Go for duels','Urban streets','Reliable','Take charge','Operator','Short & direct','Competition','Purple & Gold']},
+      {name:'Clove',role:'Controller',traits:['Reactive','Strategy & planning','Support & intel','Balanced','Urban streets','Energetic','Adapt','Vandal','Fun with friends']},
+      {name:'Cypher',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Outthink the enemy','Urban streets','Strategic','Stay focused','Operator','Short & direct','Tactics']},
+      {name:'Deadlock',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Use utility smartly','Industrial site','Reliable','Stay focused','Phantom','Calm & steady','Teamwork']},
       {name:'Fade',role:'Initiator',traits:['Slow & methodical','Team coordination','Support & intel','Outthink the enemy','Urban streets','Strategic','Stay calm and wait','Operator','Purple & Gold','Tactics']},
       {name:'Gekko',role:'Initiator',traits:['Reactive','Team coordination','Support & intel','Balanced','Urban streets','Supportive','Adapt','Vandal','Energetic','Fun with friends']},
-      {name:'Veto',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','Industrial site','Strategic','Adapt','Phantom','Teamwork']},
-
-      {name:'Sage',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Stay calm and wait','High-tech lab','Supportive','Reliable','Sheriff','Calm & steady','Teamwork','Blue & Silver']},
-      {name:'Cypher',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Outthink the enemy','Urban streets','Strategic','Stay focused','Operator','Short & direct','Tactics']},
+      {name:'Harbor',role:'Controller',traits:['Balanced','Strategy & planning','Support & intel','Use utility smartly','Nature/forest','Reliable','Adapt','Phantom','Teamwork','Blue & Silver','Fun with friends']},
+      {name:'Iso',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Industrial site','Aggressive','Take charge','Sheriff','Short & direct','Competition']},
+      {name:'Jett',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Laugh it off','Competition','Short & direct','Red & Black','Adrenaline']},
+      {name:'KAYO',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','High-tech lab','Reliable','Stay focused','Vandal','Short & direct','Tactics']},
       {name:'Killjoy',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Use utility smartly','High-tech lab','Strategic','Analyze and learn','Phantom','Calm & steady','Mastery','Blue & Silver']},
-      {name:'Chamber',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Mid control','Go for duels','Urban streets','Reliable','Take charge','Operator','Short & direct','Competition','Purple & Gold']},
-      {name:'Deadlock',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Use utility smartly','Industrial site','Reliable','Stay focused','Phantom','Calm & steady','Teamwork']},
-      {name:'Vyse',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Outthink the enemy','High-tech lab','Strategic','Stay focused','Operator','Mastery']},
-
-      {name:'Astra',role:'Controller',traits:['Slow & methodical','Strategy & planning','Mid control','Outthink the enemy','High-tech lab','Strategic','Stay calm and wait','Operator','Purple & Gold','Mastery']}, // already included, keeps consistency
+      {name:'Neon',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','High-tech lab','Aggressive','Take charge','Vandal','Energetic','Competition']},
+      {name:'Omen',role:'Controller',traits:['Slow & methodical','Strategy & planning','Mid control','Use utility smartly','Outthink the enemy','High-tech lab','Strategic','Stay focused','Phantom','Purple & Gold','Tactics']},
+      {name:'Phoenix',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Energetic','Fun with friends','Red & Black']},
+      {name:'Raze',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Energetic','Competition','Red & Black','Adrenaline']},
+      {name:'Reyna',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Sheriff','Short & direct','Competition','Red & Black','Adrenaline']},
+      {name:'Sage',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Stay calm and wait','High-tech lab','Supportive','Reliable','Sheriff','Calm & steady','Teamwork','Blue & Silver']},
+      {name:'Skye',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Reactive','Nature/forest','Supportive','Adapt','Phantom','Teamwork','Green & Teal','Fun with friends']},
+      {name:'Sova',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','High-tech lab','Strategic','Stay calm and wait','Phantom','Teamwork','Blue & Silver','Tactics']},
       {name:'Tejo',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Energetic','Competition']},
+      {name:'Veto',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Use utility smartly','Industrial site','Strategic','Adapt','Phantom','Teamwork']},
+      {name:'Viper',role:'Controller',traits:['Slow & methodical','Strategy & planning','Anchor sites','Outthink the enemy','High-tech lab','Strategic','Stay focused','Phantom','Purple & Gold','Tactics']},
+      {name:'Vyse',role:'Sentinel',traits:['Slow & methodical','Defense & utility','Anchor sites','Outthink the enemy','High-tech lab','Strategic','Stay focused','Operator','Mastery']},
       {name:'Waylay',role:'Duelist',traits:['Fast','Aim & aggression','Entry & rush','Go for duels','Urban streets','Aggressive','Take charge','Vandal','Competition']},
-      {name:'Yoru',role:'Duelist',traits:['Fast','Aim & aggression','Reactive','Go for duels','Urban streets','Aggressive','Take charge','Operator','Short & direct','Competition']} // Yoru included twice above; keep one
-    ].filter((a,i,self)=> self.findIndex(b=>b.name===a.name)===i); // dedupe if any duplicates
+      {name:'Yoru',role:'Duelist',traits:['Fast','Aim & aggression','Reactive','Go for duels','Urban streets','Aggressive','Take charge','Operator','Short & direct','Competition']}
+    ];
 
     const qWrap=document.getElementById('qWrap');
     const progressEl=document.getElementById('progress');
@@ -158,6 +158,9 @@
     const sfx=document.getElementById('sfx');
     const resultSfx=document.getElementById('resultSfx');
     const blackFade=document.getElementById('blackFade');
+
+    // Helpful load error logging for bgm
+    bgm.addEventListener('error',()=>console.warn('⚠️ BGM failed to load from provided sources.'));
 
     let current=0; const answers=new Array(QUESTIONS.length).fill(null);
 
@@ -198,7 +201,7 @@
       let best=null,bestScore=-1;
       AGENTS.forEach(agent=>{
         let score=0;
-        if(answers[0] && answers[0]===agent.role) score+=2; // role match weight
+        if(answers[0] && answers[0]===agent.role) score+=2; // weight role match
         answers.forEach(ans=>{ if(agent.traits.includes(ans)) score++; });
         if(score>bestScore){bestScore=score;best=agent;}
       });
@@ -218,12 +221,30 @@
       window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
     }
 
+    // Smooth volume fade utility
+    function fadeVolume(target = 0.4, ms = 1500, audio = bgm) {
+      const step = 20;
+      const diff = target - audio.volume;
+      const steps = Math.max(1, ms / step);
+      const delta = diff / steps;
+      return new Promise(resolve => {
+        const interval = setInterval(() => {
+          let v = audio.volume + delta;
+          if ((delta > 0 && v >= target) || (delta < 0 && v <= target)) {
+            v = target; clearInterval(interval); resolve();
+          }
+          audio.volume = Math.max(0, Math.min(1, v));
+        }, step);
+      });
+    }
+    function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
     async function endSequence(){
-      try{await fadeVolume(0.0,600); bgm.pause();}catch(e){}
+      try{ await fadeVolume(0.0, 1200); bgm.pause(); }catch(e){}
       blackFade.classList.add('on'); await wait(800);
-      try{resultSfx.currentTime=0; resultSfx.volume=0.75; await resultSfx.play();}catch(e){}
+      try{ resultSfx.currentTime=0; resultSfx.volume=0.75; await resultSfx.play(); }catch(e){}
       await wait(600); blackFade.classList.remove('on');
-      try{bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,900);}catch(e){}
+      try{ bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4, 900); }catch(e){}
     }
 
     restartBtn.addEventListener('click',()=>{
@@ -238,22 +259,18 @@
     function animatePulse(){ if(!analyser) return; analyser.getByteFrequencyData(freqData); const bass=avg(freqData,0,10); const highs=avg(freqData,40,120); const intensity=Math.min(0.6,(bass/255)*0.6); document.documentElement.style.setProperty('--pulseAlpha',intensity.toFixed(3)); hue=(hue+0.6+highs/1000)%360; const gradA=`hsl(${(hue)%360},90%,58%)`; const gradB=`hsl(${(hue+30)%360},90%,60%)`; document.documentElement.style.setProperty('--pulse',gradA); document.documentElement.style.setProperty('--gradStart',gradA); document.documentElement.style.setProperty('--gradEnd',gradB); rafId=requestAnimationFrame(animatePulse); }
     function startReactive(){ if(!audioCtx) setupAudio(); if(!rafId){rafId=requestAnimationFrame(animatePulse);} }
 
-    function fadeVolume(target=0.4,ms=1200){ const step=16; const delta=(target-bgm.volume)/(ms/step); return new Promise(res=>{ const id=setInterval(()=>{ let v=bgm.volume+delta; if((delta>0 && v>=target) || (delta<0 && v<=target)){ v=target; clearInterval(id);} bgm.volume=Math.max(0,Math.min(1,v)); if(v===target) res(); },step); }); }
-    function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-    // Start with music ON: try autoplay, then ensure on first user interaction
+    // Start with music ON: try autoplay; if blocked, start on first interaction, with fade-in
     async function startMusicOnLoad(){
       try{
-        setupAudio(); bgm.volume=0.4;
-        await bgm.play(); // attempt autoplay
+        setupAudio(); bgm.volume = 0.0;
+        await bgm.play(); await fadeVolume(0.4, 1500);
         startReactive();
         musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
       }catch(e){
-        // Autoplay blocked: arm a one-time interaction to start
         const kick = async () => {
           try{
-            setupAudio(); bgm.volume=0.4;
-            await bgm.play();
+            setupAudio(); bgm.volume = 0.0;
+            await bgm.play(); await fadeVolume(0.4, 1500);
             startReactive();
             musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
           }catch(_){} finally{
@@ -268,16 +285,11 @@
       }
     }
 
-    // Toggle music manually
+    // Manual toggle
     musicToggle.addEventListener('click', async ()=>{
       const on = musicToggle.getAttribute('aria-pressed')==='true';
-      if(on){
-        await fadeVolume(0.0,600); bgm.pause();
-        musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false');
-      }else{
-        try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4,900); startReactive(); }catch(e){}
-        musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
-      }
+      if(on){ await fadeVolume(0.0, 600); bgm.pause(); musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); }
+      else{ try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4, 900); startReactive(); }catch(e){} musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }
     });
 
     // Play UI sound ONLY when selecting an answer
