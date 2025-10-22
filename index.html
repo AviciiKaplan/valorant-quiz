@@ -83,12 +83,11 @@
 
   <div id="blackFade"></div>
 
-  <!-- Dual-path + ogg fallback -->
- <audio id="bgm" preload="auto" loop>
-  <source src="audio/zedd_spectrum.mp3" type="audio/mpeg">
-  <source src="audio/zedd_spectrum.ogg" type="audio/ogg">
-  Your browser does not support the audio element.
-</audio>
+  <audio id="bgm" preload="auto" loop>
+    <source src="audio/zedd_spectrum.mp3" type="audio/mpeg">
+    <source src="audio/zedd_spectrum.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
   <audio id="sfx" src="valorant_ui.mp3" preload="auto"></audio>
   <audio id="resultSfx" src="zedd_final.mp3" preload="auto"></audio>
 
@@ -108,7 +107,7 @@
       {q:'What motivates you to win?',opts:['Competition','Teamwork','Strategy','Improvement']},
       {q:'Your communication style?',opts:['Short & direct','Calm & steady','Energetic','Silent but effective']},
       {q:'Pick your color palette:',opts:['Red & Black','Blue & Silver','Green & Teal','Purple & Gold']},
-      {q:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
+      {qG:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
     ];
 
     // Full roster (based on your folder list) with traits
@@ -261,14 +260,18 @@
     // Start with music ON: try autoplay; if blocked, start on first interaction, with fade-in
     async function startMusicOnLoad(){
       try{
-        setupAudio(); bgm.volume = 0.0;
+        setupAudio();
+        if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
+        bgm.volume = 0.0;
         await bgm.play(); await fadeVolume(0.4, 1500);
         startReactive();
         musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
       }catch(e){
         const kick = async () => {
           try{
-            setupAudio(); bgm.volume = 0.0;
+            setupAudio();
+            if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
+            bgm.volume = 0.0;
             await bgm.play(); await fadeVolume(0.4, 1500);
             startReactive();
             musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
@@ -287,8 +290,21 @@
     // Manual toggle
     musicToggle.addEventListener('click', async ()=>{
       const on = musicToggle.getAttribute('aria-pressed')==='true';
-      if(on){ await fadeVolume(0.0, 600); bgm.pause(); musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); }
-      else{ try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4, 900); startReactive(); }catch(e){} musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }
+      if(on){ 
+        await fadeVolume(0.0, 600); bgm.pause(); 
+        musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); 
+      }
+      else{ 
+        try{ 
+          setupAudio(); 
+          if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
+          bgm.volume=0.0; 
+          await bgm.play(); 
+          await fadeVolume(0.4, 900); 
+          startReactive(); 
+        }catch(e){} 
+        musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); 
+      }
     });
 
     // Play UI sound ONLY when selecting an answer
