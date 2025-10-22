@@ -45,9 +45,31 @@
     #blackFade.on{opacity:1}
     .audio-controls{display:flex;gap:10px;align-items:center}
     .toggle{appearance:none;background:#0f1422;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer}
+
+    /* Click-to-Start overlay */
+    #startScreen {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.96); color: white;
+      z-index: 99999; text-align: center;
+    }
+    #startBtn {
+      padding: 12px 28px; border: none; border-radius: 10px;
+      background: linear-gradient(135deg,var(--gradStart),var(--gradEnd));
+      color: white; font-weight: 700; font-size: 1.1rem;
+      margin-top: 10px; cursor: pointer; box-shadow:0 0 20px rgba(255,70,85,0.4);
+    }
+    #startBtn:hover { filter: brightness(1.15); transform: scale(1.03); }
   </style>
 </head>
 <body>
+
+  <!-- Click-to-Start Overlay -->
+  <div id="startScreen">
+    <p>🎧 Click below to begin the quiz</p>
+    <button id="startBtn">Start Quiz</button>
+  </div>
+
   <div class="container fade-in">
     <header>
       <h1>Which Valorant Agent Are You?</h1>
@@ -83,9 +105,11 @@
 
   <div id="blackFade"></div>
 
+  <!-- Dual-path + ogg fallback -->
   <audio id="bgm" preload="auto" loop>
+    <source src="zedd_spectrum.mp3" type="audio/mpeg">
     <source src="audio/zedd_spectrum.mp3" type="audio/mpeg">
-    <source src="audio/zedd_spectrum.ogg" type="audio/ogg">
+    <source src="zedd_spectrum.ogg" type="audio/ogg">
     Your browser does not support the audio element.
   </audio>
   <audio id="sfx" src="valorant_ui.mp3" preload="auto"></audio>
@@ -107,10 +131,10 @@
       {q:'What motivates you to win?',opts:['Competition','Teamwork','Strategy','Improvement']},
       {q:'Your communication style?',opts:['Short & direct','Calm & steady','Energetic','Silent but effective']},
       {q:'Pick your color palette:',opts:['Red & Black','Blue & Silver','Green & Teal','Purple & Gold']},
-      {qG:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
+      {q:'You play Valorant mostly for…',opts:['Adrenaline','Tactics','Fun with friends','Mastery']}
     ];
 
-    // Full roster (based on your folder list) with traits
+    // Full roster with traits
     const AGENTS=[
       {name:'Astra',role:'Controller',traits:['Slow & methodical','Strategy & planning','Mid control','Outthink the enemy','High-tech lab','Strategic','Stay calm and wait','Operator','Purple & Gold','Mastery']},
       {name:'Breach',role:'Initiator',traits:['Balanced','Team coordination','Support & intel','Entry & rush','Industrial site','Aggressive','Take charge','Vandal','Energetic','Competition']},
@@ -252,67 +276,65 @@
 
     // Audio + RGB reactive
     let audioCtx,analyser,srcNode,freqData; let rafId=null; let hue=0;
-    function setupAudio(){ if(audioCtx) return; audioCtx=new(window.AudioContext||window.webkitAudioContext)(); analyser=audioCtx.createAnalyser(); analyser.fftSize=1024; freqData=new Uint8Array(analyser.frequencyBinCount); srcNode=audioCtx.createMediaElementSource(bgm); srcNode.connect(analyser); analyser.connect(audioCtx.destination); }
+    function setupAudio(){
+      if(audioCtx) return;
+      audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      analyser=audioCtx.createAnalyser(); analyser.fftSize=1024;
+      freqData=new Uint8Array(analyser.frequencyBinCount);
+      srcNode=audioCtx.createMediaElementSource(bgm);
+      srcNode.connect(analyser); analyser.connect(audioCtx.destination);
+    }
     function avg(arr,s=0,e=arr.length){ let t=0,c=0; for(let i=s;i<e;i++){t+=arr[i];c++;} return c? t/c : 0; }
-    function animatePulse(){ if(!analyser) return; analyser.getByteFrequencyData(freqData); const bass=avg(freqData,0,10); const highs=avg(freqData,40,120); const intensity=Math.min(0.6,(bass/255)*0.6); document.documentElement.style.setProperty('--pulseAlpha',intensity.toFixed(3)); hue=(hue+0.6+highs/1000)%360; const gradA=`hsl(${(hue)%360},90%,58%)`; const gradB=`hsl(${(hue+30)%360},90%,60%)`; document.documentElement.style.setProperty('--pulse',gradA); document.documentElement.style.setProperty('--gradStart',gradA); document.documentElement.style.setProperty('--gradEnd',gradB); rafId=requestAnimationFrame(animatePulse); }
+    function animatePulse(){
+      if(!analyser) return;
+      analyser.getByteFrequencyData(freqData);
+      const bass=avg(freqData,0,10); const highs=avg(freqData,40,120);
+      const intensity=Math.min(0.6,(bass/255)*0.6);
+      document.documentElement.style.setProperty('--pulseAlpha',intensity.toFixed(3));
+      hue=(hue+0.6+highs/1000)%360;
+      const gradA=`hsl(${(hue)%360},90%,58%)`;
+      const gradB=`hsl(${(hue+30)%360},90%,60%)`;
+      document.documentElement.style.setProperty('--pulse',gradA);
+      document.documentElement.style.setProperty('--gradStart',gradA);
+      document.documentElement.style.setProperty('--gradEnd',gradB);
+      rafId=requestAnimationFrame(animatePulse);
+    }
     function startReactive(){ if(!audioCtx) setupAudio(); if(!rafId){rafId=requestAnimationFrame(animatePulse);} }
 
-    // Start with music ON: try autoplay; if blocked, start on first interaction, with fade-in
+    // Start music with fade-in after user clicks Start
     async function startMusicOnLoad(){
       try{
-        setupAudio();
-        if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
-        bgm.volume = 0.0;
+        setupAudio(); bgm.volume = 0.0;
         await bgm.play(); await fadeVolume(0.4, 1500);
         startReactive();
         musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
       }catch(e){
-        const kick = async () => {
-          try{
-            setupAudio();
-            if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
-            bgm.volume = 0.0;
-            await bgm.play(); await fadeVolume(0.4, 1500);
-            startReactive();
-            musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true');
-          }catch(_){} finally{
-            window.removeEventListener('click', kick);
-            window.removeEventListener('keydown', kick);
-            window.removeEventListener('touchstart', kick);
-          }
-        };
-        window.addEventListener('click', kick, {once:true});
-        window.addEventListener('keydown', kick, {once:true});
-        window.addEventListener('touchstart', kick, {once:true});
+        console.warn('Autoplay blocked, but Start button should have handled it:', e);
       }
     }
 
     // Manual toggle
     musicToggle.addEventListener('click', async ()=>{
       const on = musicToggle.getAttribute('aria-pressed')==='true';
-      if(on){ 
-        await fadeVolume(0.0, 600); bgm.pause(); 
-        musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); 
-      }
-      else{ 
-        try{ 
-          setupAudio(); 
-          if (audioCtx.state === 'suspended') { await audioCtx.resume(); } // <<< FIX ADDED
-          bgm.volume=0.0; 
-          await bgm.play(); 
-          await fadeVolume(0.4, 900); 
-          startReactive(); 
-        }catch(e){} 
-        musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); 
-      }
+      if(on){ await fadeVolume(0.0, 600); bgm.pause(); musicToggle.textContent='🔇 Music Off'; musicToggle.setAttribute('aria-pressed','false'); }
+      else{ try{ setupAudio(); bgm.volume=0.0; await bgm.play(); await fadeVolume(0.4, 900); startReactive(); }catch(e){} musicToggle.textContent='🔊 Music On'; musicToggle.setAttribute('aria-pressed','true'); }
     });
 
     // Play UI sound ONLY when selecting an answer
     function playUI(){ try{ const a=sfx.cloneNode(true); a.volume=0.55; a.play().catch(()=>{}); }catch(e){} }
 
-    // Boot
+    // Boot quiz UI
     renderQuestion(0);
-    window.addEventListener('load', startMusicOnLoad);
+
+    // Click-to-start overlay logic (cross-browser autoplay compliance)
+    window.addEventListener('load', () => {
+      const startScreen = document.getElementById('startScreen');
+      const startBtn = document.getElementById('startBtn');
+      startBtn.addEventListener('click', async () => {
+        startScreen.remove();
+        await startMusicOnLoad(); // begin Zedd theme w/ fade-in
+      });
+    });
   </script>
 </body>
 </html>
